@@ -38,6 +38,8 @@ history = model.fit(
     batch_size=32
 )
 
+model.save('points.keras')
+
 loss, acc = model.evaluate(X_val, y_val)
 print(f"Validation accuracy: {acc:.3f}")
 

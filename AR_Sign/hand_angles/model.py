@@ -56,7 +56,7 @@ X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_st
 num_classes = len(set(y))  # number of gesture classes
 
 model = tf.keras.Sequential([
-    tf.keras.layers.Input(shape=(16,)),     # 15 angles
+    tf.keras.layers.Input(shape=(16,)),     # 16 angles
     tf.keras.layers.Dense(128, activation='relu'),
     tf.keras.layers.Dense(64, activation='relu'),
     tf.keras.layers.Dense(num_classes, activation='softmax')
@@ -68,12 +68,16 @@ model.compile(
     metrics=['accuracy']
 )
 
+
 history = model.fit(
     X_train, y_train,
     validation_data=(X_val, y_val),
     epochs=50,
     batch_size=32
 )
+
+model.save('angles.keras')
+
 
 loss, acc = model.evaluate(X_val, y_val)
 print(f"Validation accuracy: {acc:.3f}")
