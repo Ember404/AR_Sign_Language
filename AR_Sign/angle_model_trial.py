@@ -23,7 +23,7 @@ def angle_2d(v1, v2):
 def compute_hand_joint_angles_2d(landmarks, image_shape):
     h, w = image_shape[:2]
     pts = np.array([[lm.x * w, lm.y * h] for lm in landmarks])
-    pts = numpy.append(pts,[landmarks[0].x, landmarks[9].y])
+    pts = np.vstack([pts, [landmarks[0].x * w, landmarks[9].y * h]])
     # define joint triplets
     angle_triplets = [
         (2, 1, 3), (3, 2, 4), #thumb
@@ -32,7 +32,7 @@ def compute_hand_joint_angles_2d(landmarks, image_shape):
         (13, 0, 14), (14, 13, 15), (15, 14, 16), #ring
         (17, 0, 18), (18, 17, 19), (19, 18, 20), #pinky
         (2,0,17), #palm width
-        (0,9,21)
+        (0,21,9)#hand rotation
     ]
 
     angles = []
@@ -40,6 +40,7 @@ def compute_hand_joint_angles_2d(landmarks, image_shape):
         v1 = pts[prev] - pts[center]
         v2 = pts[nxt] - pts[center]
         angle = angle_2d(v1, v2)
+        print(pts[prev], pts[center], pts[nxt], v1,v2, angle)
         angles.append(angle) #normalizing
 
     return np.array(angles)
@@ -57,7 +58,7 @@ cap = cv2.VideoCapture(0)
 # Get model’s expected input shape (should be 16)
 input_shape = model.input_shape[-1]
 
-labels = ["D","A","B","C","E","G","H","I","K","L","M","N","O","P","R","S","U","W","Y"]
+labels = ["D","A","B","C","E","F","G","H","I","K","L","M","N","O","P","R","S","U","W","Y"]
 # --- Main loop ---
 while True:
     ret, frame = cap.read()
@@ -71,12 +72,11 @@ while True:
 
     if result.multi_hand_landmarks:
         for hand_landmarks in result.multi_hand_landmarks:
+            angles = compute_hand_joint_angles_2d(hand_landmarks.landmark, frame.shape).reshape(1, 16)
             # Draw landmarks
             mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-
-            angles = compute_hand_joint_angles_2d(hand_landmarks.landmark, frame.shape)
-            print(angles.shape, input_shape)
-            if angles.shape == input_shape:
+            if angles.shape[1] == input_shape:
+                print("DETECTING")
                 pred = model.predict(angles, verbose=0)
                 class_id = np.argmax(pred)
                 confidence = np.max(pred)

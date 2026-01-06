@@ -29,6 +29,7 @@ cos_theta = np.clip(cos_theta, -1, 1)  # keep within valid range
 # Compute angle in degrees
 df_all["angle_hand"] = np.arccos(cos_theta)
 
+
 df = pd.concat([df_all.iloc[:, :1], df_all.iloc[:, -16:]], axis=1)
 print(df.head())
 X = df.drop("letter", axis=1).values.astype("float32")  #drop labels
