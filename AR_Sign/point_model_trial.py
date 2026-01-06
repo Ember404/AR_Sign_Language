@@ -23,7 +23,7 @@ cap = cv2.VideoCapture(0)
 # Get model’s expected input shape (should be 42 if using 21 (x,y) points)
 input_shape = model.input_shape[-1]
 
-labels = ["A","B","C","M"]
+labels = ["D","A","B","C","E","G","H","I","K","L","M","N","O","P","R","S","U","W","Y"]
 # --- Main loop ---
 while True:
     ret, frame = cap.read()
